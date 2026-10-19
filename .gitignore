@@ -12,6 +12,7 @@
 /backend/**/[Pp]ublishOutput/
 /backend/**/TestResults/
 /backend/**/coverage/
+/backend/**/.vs/
 /backend/**/BenchmarkDotNet.Artifacts/
 *.trx
 *.coverage
