@@ -1,0 +1,266 @@
+# StockFlow MVP Data Model
+
+## Document status
+
+This is a proposed Phase 00 model for one company. It is a design baseline, not an existing schema and not a migration. The current repository has no verified domain, Identity, or persistence model.
+
+## Proposed defaults
+
+These defaults are proposed and require confirmation during Phase 01:
+
+- Use `Guid` identifiers for domain and Identity-related records where the selected Identity configuration supports them.
+- Store timestamps in UTC.
+- Store quantities as `decimal(18,3)` and monetary values as `decimal(18,2)`.
+- Calculate each line total as `quantity * unit price`, rounded to 2 decimals using `MidpointRounding.AwayFromZero`.
+- Calculate a document total as the sum of already-rounded line totals, not by rounding only the final sum.
+- Reject values exceeding the supported precision or range; do not silently truncate or overflow.
+- Normalize unique codes and SKUs consistently before uniqueness checks (trim and apply the agreed invariant case normalization; preserve a display value separately if needed).
+- Deactivate referenced master records instead of deleting them.
+- Use optimistic concurrency tokens on mutable documents, assignments, balances, and relevant master records. Commands should carry the expected version/ETag where applicable and receive a conflict on stale state.
+- API retries must reload current state after a concurrency conflict. Posting commands must be idempotent by stable document/posting identity; clients must not blindly replay an unknown-outcome non-idempotent request.
+
+## Mermaid ERD
+
+The diagram shows domain relationships. `StockMovement.SourceReference` is intentionally represented as an attribute, not as ordinary foreign-key edges to multiple document tables; a relational database cannot enforce a single FK to several unrelated tables without a separate reference design.
+
+```mermaid
+erDiagram
+	Branch ||--o{ Warehouse : contains
+	Warehouse ||--o{ UserWarehouse : assigned
+	Category ||--o{ Product : classifies
+	Unit ||--o{ Product : base_unit
+	Supplier ||--o{ PurchaseOrder : supplies
+	Warehouse ||--o{ OpeningStockDocument : receives
+	OpeningStockDocument ||--|{ OpeningStockLine : has
+	Product ||--o{ OpeningStockLine : identifies
+	Warehouse ||--o{ PurchaseOrder : destination
+	PurchaseOrder ||--|{ PurchaseOrderLine : has
+	Product ||--o{ PurchaseOrderLine : identifies
+	PurchaseOrder ||--o| PurchaseReceipt : receives_once
+	PurchaseReceipt ||--|{ PurchaseReceiptLine : copies
+	Product ||--o{ PurchaseReceiptLine : identifies
+	Warehouse ||--o{ StockIssue : issues
+	StockIssue ||--|{ StockIssueLine : has
+	Product ||--o{ StockIssueLine : identifies
+	Warehouse ||--o{ StockTransfer : source
+	Warehouse ||--o{ StockTransfer : destination
+	StockTransfer ||--|{ StockTransferLine : has
+	Product ||--o{ StockTransferLine : identifies
+	Warehouse ||--o{ StockBalance : stores
+	Product ||--o{ StockBalance : balances
+	Warehouse ||--o{ StockMovement : occurs_at
+	Product ||--o{ StockMovement : moves
+
+	Branch {
+		Guid Id PK
+		string Code UK
+		string Name
+		bool IsActive
+		byte[] RowVersion
+	}
+	Warehouse {
+		Guid Id PK
+		Guid BranchId FK
+		string Code UK
+		string Name
+		bool IsActive
+		byte[] RowVersion
+	}
+	Category {
+		Guid Id PK
+		string Code UK
+		string Name
+		bool IsActive
+	}
+	Unit {
+		Guid Id PK
+		string Code UK
+		string Name
+		bool IsActive
+	}
+	Product {
+		Guid Id PK
+		string SKU UK
+		string Name
+		Guid CategoryId FK
+		Guid BaseUnitId FK
+		bool IsActive
+		byte[] RowVersion
+	}
+	Supplier {
+		Guid Id PK
+		string Code UK
+		string Name
+		bool IsActive
+		byte[] RowVersion
+	}
+	UserWarehouse {
+		Guid UserId PK
+		Guid WarehouseId PK
+		datetime AssignedAtUtc
+		Guid AssignedByUserId
+		byte[] RowVersion
+	}
+	PurchaseOrder {
+		Guid Id PK
+		Guid SupplierId FK
+		Guid WarehouseId FK
+		string Number UK
+		string Status
+		decimal Total
+		datetime SubmittedAtUtc
+		datetime ReceivedAtUtc
+		byte[] RowVersion
+	}
+	PurchaseOrderLine {
+		Guid Id PK
+		Guid PurchaseOrderId FK
+		Guid ProductId FK
+		decimal Quantity
+		decimal UnitPrice
+		decimal LineTotal
+	}
+	PurchaseReceipt {
+		Guid Id PK
+		Guid PurchaseOrderId FK UK
+		string Status
+		datetime PostedAtUtc
+		byte[] RowVersion
+	}
+	PurchaseReceiptLine {
+		Guid Id PK
+		Guid PurchaseReceiptId FK
+		Guid ProductId FK
+		decimal Quantity
+		decimal UnitPrice
+		decimal LineTotal
+	}
+	OpeningStockDocument {
+		Guid Id PK
+		Guid WarehouseId FK
+		string Number UK
+		string Status
+		byte[] RowVersion
+	}
+	OpeningStockLine {
+		Guid Id PK
+		Guid DocumentId FK
+		Guid ProductId FK
+		decimal Quantity
+	}
+	StockIssue {
+		Guid Id PK
+		Guid WarehouseId FK
+		string Number UK
+		string Reason
+		string Status
+		byte[] RowVersion
+	}
+	StockIssueLine {
+		Guid Id PK
+		Guid DocumentId FK
+		Guid ProductId FK
+		decimal Quantity
+	}
+	StockTransfer {
+		Guid Id PK
+		Guid SourceWarehouseId FK
+		Guid DestinationWarehouseId FK
+		string Number UK
+		string Status
+		byte[] RowVersion
+	}
+	StockTransferLine {
+		Guid Id PK
+		Guid DocumentId FK
+		Guid ProductId FK
+		decimal Quantity
+	}
+	StockBalance {
+		Guid WarehouseId PK, FK
+		Guid ProductId PK, FK
+		decimal Quantity
+		byte[] RowVersion
+	}
+	StockMovement {
+		Guid Id PK
+		Guid WarehouseId FK
+		Guid ProductId FK
+		decimal QuantitySigned
+		string SourceType
+		Guid SourceId
+		datetime OccurredAtUtc
+	}
+```
+
+`UserWarehouse` is shown with a composite key of `(UserId, WarehouseId)`, although the user itself is stored by ASP.NET Identity. Warehouse assignments are not related to products; product visibility is governed by the separately defined shared-catalog policy.
+
+## Domain entities and essential fields
+
+### Organization and catalog
+
+- **Branch**: `Id`, normalized unique `Code`, `Name`, `IsActive`, concurrency token. A company has many branches.
+- **Warehouse**: `Id`, `BranchId`, normalized unique `Code`, `Name`, `IsActive`, concurrency token. A branch contains warehouses; warehouse code is unique within the company unless a later decision narrows it to branch scope.
+- **Category**: `Id`, normalized unique `Code`, `Name`, `IsActive`.
+- **Unit**: `Id`, normalized unique `Code`, `Name`, `IsActive`.
+- **Product**: `Id`, normalized unique `SKU`, `Name`, `CategoryId`, `BaseUnitId`, `IsActive`, concurrency token. Exactly one base unit is required; no conversion table exists in the MVP.
+- **Supplier**: `Id`, normalized unique `Code`, `Name`, `IsActive`, concurrency token.
+
+### Access
+
+- **UserWarehouse**: composite key `UserId + WarehouseId`, assignment metadata, and concurrency token. It links an Identity user to a warehouse and supplies warehouse scope.
+- Roles are represented by Identity role persistence, not a domain `Role` entity in this model.
+
+### Documents and lines
+
+- **PurchaseOrder**: header `Id`, business number, `SupplierId`, destination `WarehouseId`, status, totals, timestamps, and version. It has one or more `PurchaseOrderLine` records.
+- **PurchaseOrderLine**: `Id`, `PurchaseOrderId`, `ProductId`, positive `Quantity`, nonnegative `UnitPrice`, rounded `LineTotal`. Unique `(PurchaseOrderId, ProductId)`.
+- **PurchaseReceipt**: `Id`, unique `PurchaseOrderId`, status, posting metadata, and version. It has copied `PurchaseReceiptLine` records.
+- **PurchaseReceiptLine**: receipt ID, product ID, positive quantity copied from the submitted PO, unit price, and rounded line total. Unique `(PurchaseReceiptId, ProductId)`.
+- **OpeningStockDocument / Line**: warehouse header and unique product lines with positive quantities.
+- **StockIssue / Line**: warehouse header with required reason and unique product lines with positive quantities.
+- **StockTransfer / Line**: source and destination warehouse header and unique product lines with positive quantities. Source and destination must differ.
+
+All document headers contain lifecycle status, creator/posting actor metadata, created/updated UTC timestamps, and a concurrency token in the implemented model. Exact common-base inheritance is an implementation choice, not a requirement.
+
+### Stock and audit
+
+- **StockBalance**: composite key `(WarehouseId, ProductId)`, current nonnegative quantity, and concurrency token. It is a transactional projection maintained with movements.
+- **StockMovement**: append-only `Id`, warehouse, product, signed quantity, UTC occurrence time, actor/audit metadata, and a source reference. Transfer posting creates one negative source movement and one positive destination movement.
+- **AuditLog**: `Id`, UTC timestamp, actor Identity user ID, action, outcome, target type/ID, warehouse scope where applicable, correlation/request ID, and sanitized structured details. Audit rows are append-only and are committed with stock-affecting state.
+
+## Polymorphic movement reference
+
+`StockMovement.SourceType` and `SourceId` identify the originating document or posting operation (for example, `OpeningStock`, `PurchaseReceipt`, `StockIssue`, or `StockTransfer`). `SourceId` must not be modeled as four ordinary nullable foreign keys to those tables: such columns would not express a single enforceable polymorphic FK. The implementation must choose one of these explicit strategies during Phase 01:
+
+1. A source-reference table with a single key and controlled source-kind mapping.
+2. A common immutable `StockDocument`/posting aggregate table referenced by movement, with specialized document details.
+3. Application/database validation over `(SourceType, SourceId)` with a unique idempotency constraint, accepting that the database cannot enforce the target FK directly.
+
+Regardless of strategy, enforce uniqueness sufficient to prevent repeated posting effects, and retain source type plus ID for traceability.
+
+## Identity persistence versus domain entities
+
+ASP.NET Core Identity persistence is infrastructure/authentication storage. It normally includes tables equivalent to `AspNetUsers`, `AspNetRoles`, `AspNetUserRoles`, claims, logins, tokens, and related keys. The Identity user key is referenced by `UserWarehouse.AssignedByUserId`, document actor fields, and `AuditLog.ActorUserId` as an application-level relationship or configured FK where appropriate.
+
+Identity models must not be placed in the Domain project or coupled to domain rules. Domain entities include warehouses, catalog, documents, balances, movements, and audit concepts; Infrastructure owns EF Core mappings, SQL Server details, and Identity stores. The exact Identity table names and custom user fields are unresolved.
+
+## Refresh sessions
+
+If refresh-token authentication is selected, an Infrastructure-owned **RefreshSession** persistence model should include `Id`, `UserId`, a one-way token hash (never the raw token), issued/expiry/revoked UTC timestamps, replacement/revocation reason, device/client metadata subject to privacy rules, and a concurrency token. Add a unique lookup key for the token hash. It is not a stock domain entity. If cookie/session authentication is selected instead, this record may not be needed; the authentication decision is unresolved.
+
+## Constraints and indexes
+
+- Unique normalized codes/SKU/business document numbers according to the finalized scope.
+- Unique `(PurchaseOrderId, ProductId)` and one-to-one unique `PurchaseReceipt.PurchaseOrderId`.
+- Unique product per opening, issue, transfer, and receipt document.
+- Composite primary key `(WarehouseId, ProductId)` for `StockBalance`.
+- Unique posting/idempotency key for each stock document effect and unique movement source identity as selected in the polymorphic-reference strategy.
+- Check constraints or application validation for positive input quantities, nonnegative prices, valid statuses, different transfer warehouses, and nonnegative balances.
+- Index movements by `(WarehouseId, ProductId, OccurredAtUtc)` and by source identity for reconciliation and duplicate detection.
+- Index `UserWarehouse` by `WarehouseId, UserId` for scope checks.
+- Do not hard-delete referenced master records.
+
+## Concurrency and transaction requirements
+
+A posting transaction must lock or otherwise safely update all affected `StockBalance` rows, verify available quantity, append all movements, change document/receipt status, and append the business audit event before commit. A failed transfer rolls back both warehouses. SQL Server behavior must be proven with an isolated real SQL Server test database in a later implementation phase; no such verification was run in Phase 00.
