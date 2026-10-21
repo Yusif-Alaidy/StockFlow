@@ -32,6 +32,7 @@ internal static class ConfigurationExtensions
                     : null);
 
         // No global IsActive filter: historical references must remain visible.
-        // RowVersion/ETag behavior will be added in the persistence/API phases.
+        // Shadow column: no changes to the Domain BaseEntity are needed.
+        builder.Property<byte[]>("RowVersion").IsRowVersion();
     }
 }

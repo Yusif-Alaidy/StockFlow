@@ -1,6 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
 	<IsTestProject>true</IsTestProject>
+	<UserSecretsId>8d9442fa-2ee8-4f56-8781-28e05a5a360e</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
    <ProjectReference Include="..\..\src\stockFlow.Api\stockFlow.csproj" />
