@@ -1,1 +1,33 @@
 # StockFlow
+
+## Repository layout
+
+- `backend/stockFlow/` — .NET 10 backend solution and API host.
+- `backend/stockFlow/src/stockFlow.Domain/` — domain layer.
+- `backend/stockFlow/src/stockFlow.Application/` — application/use-case layer.
+- `backend/stockFlow/src/stockFlow.Infrastructure/` — infrastructure composition layer.
+- `backend/stockFlow/tests/` — unit, integration, and architecture test projects.
+- `frontend/` — frontend application.
+- `docs/` — requirements, business rules, data model, architecture, backlog, and progress.
+
+## Prerequisites
+
+- .NET SDK `10.0.401` or a compatible SDK selected by `global.json`.
+- A shell started at the repository root.
+- No database or external service is required for the Phase 01 foundation checks.
+
+## Restore, build, and test
+
+Run these commands from `backend/stockFlow/` unless noted otherwise:
+
+```powershell
+dotnet restore .\stockFlow.slnx
+dotnet build .\stockFlow.slnx --no-restore
+dotnet test .\tests\stockFlow.ArchitectureTests\stockFlow.ArchitectureTests.csproj --no-restore
+```
+
+The architecture tests inspect project files and package references to enforce the dependency rules. Unit and integration projects are infrastructure only in Phase 01 and contain no business tests.
+
+## Scope
+
+Phase 01 establishes the Clean Architecture project boundaries, minimal DI composition, SDK/build conventions, and architecture checks. It does not implement business entities, workflows, database mappings, migrations, authentication, API endpoints, or frontend features.

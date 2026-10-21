@@ -1,4 +1,7 @@
 
+using stockFlow.Application;
+using stockFlow.Infrastructure;
+
 namespace stockFlow;
 
 public class Program
@@ -7,9 +10,15 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+
         // Add services to the container.
 
         builder.Services.AddControllers();
+        builder.Services.AddApplication();
+        var connectionString = builder.Configuration
+        .GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
+
+        builder.Services.AddInfrastructure(connectionString);
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 

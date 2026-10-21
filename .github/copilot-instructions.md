@@ -1,54 +1,36 @@
-\# StockFlow Project Instructions
+# StockFlow Project Instructions
 
+## Repository structure
 
+- Repository root: StockFlow/
+- Backend solution and projects: backend/stockFlow/
+  - API host: backend/stockFlow/stockFlow.csproj
+  - Production layers: backend/stockFlow/src/stockFlow.Domain, stockFlow.Application, stockFlow.Infrastructure
+  - Test projects: backend/stockFlow/tests/
+- Frontend application: frontend/
+- Shared project documentation: docs/ at the repository root.
 
-\## Repository structure
+## Workflow
 
-\- Repository root: StockFlow/
+- Implement only the requested phase.
+- Inspect existing code and project references before editing.
+- Do not recreate existing solutions or projects.
+- Preserve unrelated work.
+- Do not modify frontend files during backend tasks.
+- Do not commit, tag, deploy, or start another phase unless explicitly requested.
+- From backend/stockFlow, verify the foundation with `dotnet restore .\stockFlow.slnx`, `dotnet build .\stockFlow.slnx --no-restore`, and `dotnet test .\tests\stockFlow.ArchitectureTests\stockFlow.ArchitectureTests.csproj --no-restore`.
 
-\- Backend solution and projects: backend/stockFlow/
-
-\- Frontend application: frontend/
-
-\- Shared project documentation: docs/ at the repository root.
-
-
-
-\## Workflow
-
-\- Implement only the requested phase.
-
-\- Inspect existing code and project references before editing.
-
-\- Do not recreate existing solutions or projects.
-
-\- Preserve unrelated work.
-
-\- Do not modify frontend files during backend tasks.
-
-\- Do not commit, tag, deploy, or start another phase unless explicitly requested.
-
-
-
-\## Project context
+## Project context
 
 Read these files when present:
 
-\- .github/copilot-instructions.md
-
-\- docs/requirements.md
-
-\- docs/business-rules.md
-
-\- docs/data-model.md
-
-\- docs/architecture.md
-
-\- docs/progress.md
-
-\- Relevant source files and tests.
-
-
+- .github/copilot-instructions.md
+- docs/requirements.md
+- docs/business-rules.md
+- docs/data-model.md
+- docs/architecture.md
+- docs/progress.md
+- Relevant source files and tests.
 
 If a referenced document is missing, report it.
 
@@ -56,93 +38,51 @@ Do not invent requirements or claim that missing work is complete.
 
 During the requirements phase, create the requested documentation.
 
+## Architecture
 
+- Keep Domain independent of EF Core, Identity, ASP.NET and Infrastructure.
+- Keep Application organized by features and use cases.
+- Keep SQL Server, EF Core and Identity implementations in Infrastructure.
+- Keep API controllers thin.
+- Follow existing project names and conventions.
+- Do not introduce unnecessary patterns, packages or infrastructure.
 
-\## Architecture
-
-\- Keep Domain independent of EF Core, Identity, ASP.NET and Infrastructure.
-
-\- Keep Application organized by features and use cases.
-
-\- Keep SQL Server, EF Core and Identity implementations in Infrastructure.
-
-\- Keep API controllers thin.
-
-\- Follow existing project names and conventions.
-
-\- Do not introduce unnecessary patterns, packages or infrastructure.
-
-
-
-\## API implementation
+## API implementation
 
 For every added or changed endpoint:
 
-\- Update generated OpenAPI metadata and relevant feature documentation.
+- Update generated OpenAPI metadata and relevant feature documentation.
+- Document permissions and warehouse scope.
+- Document request/response DTOs and validation.
+- Include success and error examples.
+- Document ETags, preconditions and retry behavior where applicable.
+- Apply authorization and business rules on the server.
 
-\- Document permissions and warehouse scope.
+## Data integrity and testing
 
-\- Document request/response DTOs and validation.
+- Keep stock balances, movements, document state and business audit atomic.
+- Prevent negative stock and repeated posting effects.
+- Verify SQL transaction and concurrency behavior using an isolated real SQL Server test database.
+- Never run automated tests against the deployed database.
+- Add meaningful tests appropriate to the change.
+- Run relevant builds and tests.
+- If a check cannot run, report the exact blocker.
+- Never invent successful test or deployment results.
 
-\- Include success and error examples.
+## Secrets
 
-\- Document ETags, preconditions and retry behavior where applicable.
+- Never embed or commit credentials, tokens, signing keys, private connection strings or deployment profiles.
+- Use local secrets or environment configuration.
+- Keep committed configuration examples sanitized.
 
-\- Apply authorization and business rules on the server.
+## Completion
 
-
-
-\## Data integrity and testing
-
-\- Keep stock balances, movements, document state and business audit atomic.
-
-\- Prevent negative stock and repeated posting effects.
-
-\- Verify SQL transaction and concurrency behavior using an isolated
-
-&#x20; real SQL Server test database.
-
-\- Never run automated tests against the deployed database.
-
-\- Add meaningful tests appropriate to the change.
-
-\- Run relevant builds and tests.
-
-\- If a check cannot run, report the exact blocker.
-
-\- Never invent successful test or deployment results.
-
-
-
-\## Secrets
-
-\- Never embed or commit credentials, tokens, signing keys,
-
-&#x20; private connection strings or deployment profiles.
-
-\- Use local secrets or environment configuration.
-
-\- Keep committed configuration examples sanitized.
-
-
-
-\## Completion
-
-\- Update docs/progress.md with completed work, verification
-
-&#x20; evidence, blockers and the next recommended step.
-
-\- Finish with:
-
-&#x20; 1. Files changed.
-
-&#x20; 2. What was implemented and why.
-
-&#x20; 3. Build and test results.
-
-&#x20; 4. Remaining limitations or blockers.
-
-&#x20; 5. Suggested commit message.
-
-\- Explain the final summary in simple Arabic.
+- Update docs/progress.md with completed work, verification evidence, blockers and the next recommended step.
+- Finish with:
+  1. Files changed.
+  2. What was implemented and why.
+  3. Build and test results.
+  4. Remaining limitations or blockers.
+  5. Suggested commit message.
+- Explain the final summary in simple Arabic.
 
