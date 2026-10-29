@@ -14,7 +14,7 @@ internal static class ApiProblems
             {
                 400 => "Bad request", 401 => "Authentication required", 403 => "Access denied",
                 404 => "Resource not found", 405 => "Method not allowed", 409 => "Conflict",
-                412 => "Precondition failed", 428 => "Precondition required",
+                412 => "Precondition failed", 428 => "Precondition required", 429 => "Too many requests",
                 503 => "Service unavailable", _ => "An unexpected error occurred"
             },
             Type = "about:blank",
@@ -32,7 +32,7 @@ internal static class ApiProblems
         {
             400 => "bad_request", 401 => "unauthorized", 403 => "forbidden", 404 => "not_found",
             405 => "method_not_allowed", 409 => "conflict", 412 => "precondition_failed",
-            428 => "precondition_required", 503 => "service_unavailable", _ => "server_error"
+            428 => "precondition_required", 429 => "too_many_requests", 503 => "service_unavailable", _ => "server_error"
         });
     }
 

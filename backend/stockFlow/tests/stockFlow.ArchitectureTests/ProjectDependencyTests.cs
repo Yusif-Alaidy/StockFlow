@@ -53,7 +53,7 @@ public sealed class ProjectDependencyTests
     [Fact]
     public void Api_references_application_and_infrastructure()
     {
-        var project = LoadProject("backend/stockFlow/stockFlow.csproj");
+        var project = LoadProject("backend/stockFlow/src/stockFlow.Api/stockFlow.csproj");
 
         Assert.Equal(
             ["stockFlow.Application", "stockFlow.Infrastructure"],
@@ -65,7 +65,7 @@ public sealed class ProjectDependencyTests
     {
         var required = new[]
         {
-            "backend/stockFlow/stockFlow.csproj",
+            "backend/stockFlow/src/stockFlow.Api/stockFlow.csproj",
             "backend/stockFlow/src/stockFlow.Domain/stockFlow.Domain.csproj",
             "backend/stockFlow/src/stockFlow.Application/stockFlow.Application.csproj",
             "backend/stockFlow/src/stockFlow.Infrastructure/stockFlow.Infrastructure.csproj",
@@ -85,13 +85,13 @@ public sealed class ProjectDependencyTests
     private static IEnumerable<string> ProjectReferences(XDocument project)
     {
         return project.Descendants().Where(element => element.Name.LocalName == "ProjectReference")
-            .Select(element => element.Attribute("Include")?.Value ?? string.Empty);
+            .Select(element => (element.Attribute("Include")?.Value ?? string.Empty).Replace('\\', '/'));
     }
 
     private static IEnumerable<string> PackageReferences(XDocument project)
     {
         return project.Descendants().Where(element => element.Name.LocalName == "PackageReference")
-            .Select(element => element.Attribute("Include")?.Value ?? string.Empty);
+            .Select(element => (element.Attribute("Include")?.Value ?? string.Empty).Replace('\\', '/'));
     }
 
     private static string FindRepositoryRoot()

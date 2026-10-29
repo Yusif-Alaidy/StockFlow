@@ -10,7 +10,7 @@ using Xunit;
 
 namespace stockFlow.IntegrationTests.Persistence;
 
-[Trait("Category", "SqlServer")]
+[Trait("Category", "Sql")]
 public class DocumentSqlTests
 {
     private static readonly DateTime Now = new(2026, 10, 21, 12, 0, 0, DateTimeKind.Utc);

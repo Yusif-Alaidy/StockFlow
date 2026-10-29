@@ -1,0 +1,3 @@
+import { Component, input, output } from '@angular/core';
+@Component({selector:'sf-pager',standalone:true,template:`<footer class="pager"><span>{{total()}} سجل • صفحة {{page()}} من {{pages}}</span><div><button class="button ghost" [disabled]="page()<=1||busy()" (click)="change.emit(page()-1)">السابق</button><button class="button ghost" [disabled]="page()>=pages||busy()" (click)="change.emit(page()+1)">التالي</button></div></footer>`})
+export class Pager { page=input(1);total=input(0);size=input(20);busy=input(false);change=output<number>();get pages(){return Math.max(1,Math.ceil(this.total()/this.size()));} }

@@ -71,6 +71,12 @@ public sealed class StockReceipt
         PostedBy = actorUserId;
         PostedAt = UpdatedAt = utcNow;
     }
+    public void Reopen(Guid actorUserId, DateTime utcNow)
+    {
+        if (Status != StockDocumentStatus.Cancelled) throw new InvalidOperationException("Only cancelled receipts can be reopened.");
+        DocumentRules.Id(actorUserId); DocumentRules.Time(utcNow, UpdatedAt ?? CreatedAt);
+        Status = StockDocumentStatus.Draft; CancelledAt = null; CancelledBy = null; UpdatedAt = utcNow;
+    }
     public void Cancel(Guid actorUserId, DateTime utcNow)
     {
         EnsureDraft();

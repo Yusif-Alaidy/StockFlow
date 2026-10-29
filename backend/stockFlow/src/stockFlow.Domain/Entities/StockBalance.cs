@@ -18,5 +18,13 @@ public sealed class StockBalance
         WarehouseId = DocumentRules.Id(warehouseId);
         ProductId = DocumentRules.Id(productId);
     }
-    // No quantity mutator in Phase 03. Added with the transactional posting engine.
+    public void Apply(decimal delta)
+    {
+        if (delta == decimal.MinValue) throw new ArgumentOutOfRangeException(nameof(delta));
+        DocumentRules.Quantity(Math.Abs(delta));
+        var next = Quantity + delta;
+        if (next < 0) throw new InvalidOperationException("Insufficient stock.");
+        if (next > 999999999999999.999m) throw new ArgumentOutOfRangeException(nameof(delta));
+        Quantity = next;
+    }
 }

@@ -1,0 +1,2 @@
+import { Component,inject } from '@angular/core';import { RouterOutlet } from '@angular/router';import { Feedback } from './core/feedback';
+@Component({selector:'sf-root',standalone:true,imports:[RouterOutlet],template:`<router-outlet/>@if(feedback.message()){<div class="toast" role="status" [class.toast-error]="feedback.kind()==='error'"><span>{{feedback.message()}}</span><button aria-label="إغلاق الرسالة" (click)="feedback.message.set('')">✕</button></div>}`})export class App{feedback=inject(Feedback);}

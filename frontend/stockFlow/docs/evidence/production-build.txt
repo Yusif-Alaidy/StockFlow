@@ -1,0 +1,34 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> stockflow-frontend@1.0.0 build
+> ng build --configuration production
+
+❯ Building...
+✔ Building...
+Initial chunk files | Names         |  Raw size | Estimated transfer size
+chunk-PGKG7U4V.js   | -             | 272.84 kB |                74.47 kB
+styles-DFMIBOIB.css | styles        |  17.37 kB |                 4.10 kB
+main-DLZHZRAL.js    | main          |   3.68 kB |                 1.56 kB
+chunk-T743BZQF.js   | -             |   1.82 kB |               676 bytes
+
+                    | Initial total | 295.70 kB |                80.80 kB
+
+Lazy chunk files    | Names         |  Raw size | Estimated transfer size
+chunk-YQMDSDIC.js   | -             |  47.98 kB |                 9.53 kB
+chunk-MXKLNQYX.js   | documents     |  27.34 kB |                 6.24 kB
+chunk-5X6NW4AD.js   | masters       |  16.42 kB |                 4.20 kB
+chunk-RNZ347FR.js   | reports       |  10.68 kB |                 3.00 kB
+chunk-A7UECGRK.js   | users         |  10.29 kB |                 3.10 kB
+chunk-XOQXQBVD.js   | dashboard     |   8.88 kB |                 2.56 kB
+chunk-MI4WFAOT.js   | shell         |   7.33 kB |                 2.24 kB
+chunk-FMOWZANM.js   | login         |   5.14 kB |                 1.62 kB
+chunk-TJ5LTZ4N.js   | account       |   3.88 kB |                 1.30 kB
+chunk-SX5KWCNL.js   | -             |   2.56 kB |               750 bytes
+chunk-QLAQIYVF.js   | -             |   1.41 kB |               589 bytes
+chunk-Y7QHIDZ2.js   | -             |   1.15 kB |               509 bytes
+chunk-WKGT7DKQ.js   | -             |   1.08 kB |               529 bytes
+
+Application bundle generation complete. [8.097 seconds] - 2026-10-28T13:14:03.151Z
+
+Output location: /workspace/scratch/85031a8060ff/work/StockFlowFrontend/frontend/dist/stockflow
+

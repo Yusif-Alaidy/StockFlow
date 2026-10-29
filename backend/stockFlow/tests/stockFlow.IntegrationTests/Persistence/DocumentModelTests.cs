@@ -17,7 +17,7 @@ public class DocumentModelTests
         using var context = new StockFlowDbContext(new DbContextOptionsBuilder<StockFlowDbContext>()
             .UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=MetadataOnly;Integrated Security=True").Options);
         var model = context.Model;
-        Assert.Equal(18, model.GetEntityTypes().Count());
+        Assert.Equal(22, model.GetEntityTypes().Count());
         foreach (var type in new[] { typeof(PurchaseOrder), typeof(StockOpening), typeof(StockReceipt), typeof(StockIssue), typeof(StockTransfer), typeof(StockBalance) })
         {
             var token = model.FindEntityType(type)!.FindProperty("RowVersion")!;

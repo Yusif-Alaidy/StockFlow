@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="src\stockFlow.Application\stockFlow.Application.csproj" />
+    <None Include="src\stockFlow.Domain\stockFlow.Domain.csproj" />
+    <None Include="src\stockFlow.Infrastructure\stockFlow.Infrastructure.csproj" />
+    <None Include="tests\stockFlow.ArchitectureTests\stockFlow.ArchitectureTests.csproj" />
+    <None Include="tests\stockFlow.IntegrationTests\stockFlow.IntegrationTests.csproj" />
+    <None Include="tests\stockFlow.UnitTests\stockFlow.UnitTests.csproj" />
+  </ItemGroup>
+
+</Project>

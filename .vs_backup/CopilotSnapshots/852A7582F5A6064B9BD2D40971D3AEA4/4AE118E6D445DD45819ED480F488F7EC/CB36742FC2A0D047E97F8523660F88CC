@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="src\stockFlow.Application\stockFlow.Application.csproj" />
+    <ProjectReference Include="src\stockFlow.Infrastructure\stockFlow.Infrastructure.csproj" />
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="src\stockFlow.Application\stockFlow.Application.csproj" />
+    <None Include="src\stockFlow.Domain\stockFlow.Domain.csproj" />
+    <None Include="src\stockFlow.Infrastructure\stockFlow.Infrastructure.csproj" />
+    <None Include="tests\stockFlow.ArchitectureTests\stockFlow.ArchitectureTests.csproj" />
+    <None Include="tests\stockFlow.IntegrationTests\stockFlow.IntegrationTests.csproj" />
+    <None Include="tests\stockFlow.UnitTests\stockFlow.UnitTests.csproj" />
+  </ItemGroup>
+
+</Project>

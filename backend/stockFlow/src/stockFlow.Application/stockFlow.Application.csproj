@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UserSecretsId>711a0917-09d3-4335-bb11-d8bfe8214a35</UserSecretsId>
+  </PropertyGroup>
   <ItemGroup>
 	<ProjectReference Include="..\stockFlow.Domain\stockFlow.Domain.csproj" />
 	<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />

@@ -14,6 +14,8 @@ internal sealed class SqlTestDatabase : IAsyncDisposable
     private DbContextOptions<StockFlowDbContext>? _options;
     private string? _connectionString;
 
+    public string ConnectionString => _connectionString ?? throw new InvalidOperationException("Initialize first.");
+
     public StockFlowDbContext CreateContext() => new(_options
         ?? throw new InvalidOperationException("Initialize test database first."));
 
