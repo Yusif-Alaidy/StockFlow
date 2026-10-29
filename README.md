@@ -10,7 +10,7 @@ An Arabic-first inventory workspace for managing purchasing, warehouse operation
 ![Angular](https://img.shields.io/badge/Angular-21-DD0031?logo=angular&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
 ![SQL Server](https://img.shields.io/badge/Database-SQL_Server-CC2927)
-![Architecture](https://img.shields.io/badge/Architecture-Clean-176650)
+[![Clean Architecture](https://img.shields.io/badge/Clean_Architecture-176650)](docs/architecture.md)
 
 [Frontend](https://stock-flow-ten-dun.vercel.app) · [API](https://stock-flow.runasp.net) · [Getting Started](#getting-started) · [Documentation](#documentation)
 
